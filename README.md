@@ -273,7 +273,6 @@ SOFTWARE.
 
 - **Issues**: Open a GitHub issue for bugs or feature requests
 - **Discussions**: Use GitHub Discussions for questions
-- **Email**: [your-email@example.com]
 
 ---
 
