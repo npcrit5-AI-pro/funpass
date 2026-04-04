@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="FunPass - Generate secure, memorable passwords from poems, quotes, code snippets, and more!">
+    <meta name="keywords" content="password generator, secure passwords, leet speak, memorable passwords">
+    <meta name="author" content="FunPass">
+    <meta name="theme-color" content="#6366f1">
+    
+    <title>FunPass 🔐 - Fun & Secure Password Generator</title>
+    
+    <style>
+        /* ========================================================================
+           CSS VARIABLES & RESET
+           ======================================================================== */
+        :root {
+            --primary: #6366f1;
+            --primary-light: #818cf8;
+            --secondary: #10b981;
+            --secondary-light: #34d399;
+            --accent: #f59e0b;
+            --danger: #ef4444;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-card-hover: #334155;
+            --bg-input: #0f172a;
+            --text-primary: #f8fafc;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+            --border: #334155;
+            --border-active: #6366f1;
+            --shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+            --shadow-sm: 0 4px 12px rgba(0, 0, 0, 0.2);
+            --radius: 12px;
+            --radius-sm: 8px;
+            --radius-lg: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, var(--bg-dark) 0%, #1a1f3a 50%, var(--bg-dark) 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: var(--text-primary);
+            line-height: 1.6;
+        }
+
+        /* ========================================================================
+           LAYOUT & CONTAINER
+           ======================================================================== */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        /* ========================================================================
+           HEADER
+           ======================================================================== */
+        .header {
+            text-align: center;
+            margin-bottom: 40px;
+            padding: 30px 20px;
+        }
+
+        .logo {
+            font-size: 3rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary-light), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 10px;
+            letter-spacing: -1px;
+        }
+
+        .logo-icon {
+            font-size: 3.5rem;
+            display: block;
+            margin-bottom: 10px;
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .tagline {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .badge {
+            display: inline-block;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-top: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========================================================================
+           CATEGORY FILTER TABS
+           ======================================================================== */
+        .filter-section {
+            margin-bottom: 25px;
+        }
+
+        .filter-tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+            padding: 15px;
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            border: 1px solid var(--border);
+        }
+
+        .filter-tab {
+            padding: 8px 16px;
+            border-radius: 20px;
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.85rem;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .filter-tab:hover {
+            background: var(--bg-card-hover);
+            color: var(--text-primary);
+        }
+
+        .filter-tab.active {
+            background: var(--primary);
+            border-color: var(--primary);
+            color: white;
+        }
+
+        /* ========================================================================
+           ITEMS GRID
+           ======================================================================== */
+        .items-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 15px;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .items-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 15px;
+        }
+
+        .item-card {
+            background: var(--bg-card);
+            border: 2px solid var(--border);
+            border-radius: var(--radius);
+            padding: 16px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .item-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            opacity: 0;
+            transition: var(--transition);
+        }
+
+        .item-card:hover {
+            border-color: var(--primary-light);
+            background: var(--bg-card-hover);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-sm);
+        }
+
+        .item-card:hover::before {
+            opacity: 1;
+        }
+
+        .item-card.selected {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, rgba(99, 102, 241, 0.15), rgba(16, 185, 129, 0.1));
+            box-shadow: 0 0 20px rgba(99, 102, 241, 0.3);
+        }
+
+        .item-card.selected::before {
+            opacity: 1;
+        }
+
+        .item-header {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+        }
+
+        .item-icon {
+            font-size: 1.5rem;
+        }
+
+        .item-category {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            color: var(--secondary);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .item-author {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-left: auto;
+        }
+
+        .item-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .selected-indicator {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.8rem;
+            animation: scaleIn 0.3s ease;
+        }
+
+        .item-card.selected .selected-indicator {
+            display: flex;
+        }
+
+        @keyframes scaleIn {
+            from { transform: scale(0); }
+            to { transform: scale(1); }
+        }
+
+        /* ========================================================================
+           CONTROLS PANEL
+           ======================================================================== */
+        .controls-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 25px;
+            margin-bottom: 25px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 12px;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .length-display {
+            background: var(--primary);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            min-width: 40px;
+            text-align: center;
+        }
+
+        /* Custom Range Slider */
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 4px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--secondary) 100%);
+            outline: none;
+            -webkit-appearance: none;
+            appearance: none;
+        }
+
+        input[type="range"]::-webkit-slider-track {
+            height: 8px;
+            background: var(--bg-input);
+            border-radius: 4px;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+            transition: var(--transition);
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.5);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--primary);
+            cursor: pointer;
+            border: 3px solid white;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Checkboxes */
+        .options-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+        }
+
+        .option-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 15px;
+            background: var(--bg-input);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border);
+        }
+
+        .option-item:hover {
+            border-color: var(--primary-light);
+            background: var(--bg-card-hover);
+        }
+
+        .option-item input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            accent-color: var(--primary);
+            cursor: pointer;
+        }
+
+        .option-text {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        /* Generate Button */
+        .generate-btn {
+            width: 100%;
+            padding: 18px 30px;
+            font-size: 1.1rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            border: none;
+            border-radius: var(--radius);
+            color: white;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .generate-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .generate-btn:hover::before {
+            left: 100%;
+        }
+
+        .generate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+
+        .generate-btn.loading {
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        .spinner {
+            display: none;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+
+        .generate-btn.loading .spinner {
+            display: block;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* ========================================================================
+           RESULT SECTION
+           ======================================================================== */
+        .result-section {
+            background: var(--bg-card);
+            border-radius: var(--radius-lg);
+            padding: 30px;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow);
+            display: none;
+            animation: slideUp 0.4s ease;
+        }
+
+        .result-section.visible {
+            display: block;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .result-header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .result-title {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+
+        .result-source {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Password Display */
+        .password-display {
+            font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+            font-size: 1.5rem;
+            padding: 20px;
+            background: var(--bg-input);
+            border-radius: var(--radius);
+            margin-bottom: 20px;
+            word-break: break-all;
+            letter-spacing: 2px;
+            text-align: center;
+            border: 1px solid var(--border);
+            position: relative;
+            min-height: 70px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .password-display .char {
+            display: inline-block;
+            transition: var(--transition);
+            padding: 2px;
+        }
+
+        .password-display .char:hover {
+            transform: scale(1.2);
+            color: var(--primary-light);
+        }
+
+        .password-display .letter { color: #60a5fa; }
+        .password-display .number { color: #f59e0b; }
+        .password-display .symbol { color: #ef4444; }
+        .password-display .special { color: #a78bfa; }
+
+        /* Strength Meter */
+        .strength-section {
+            margin-bottom: 25px;
+        }
+
+        .strength-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+
+        .strength-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .strength-value {
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+            padding: 4px 12px;
+            border-radius: 20px;
+        }
+
+        .strength-value.weak {
+            background: rgba(239, 68, 68, 0.2);
+            color: var(--danger);
+        }
+
+        .strength-value.medium {
+            background: rgba(245, 158, 11, 0.2);
+            color: var(--accent);
+        }
+
+        .strength-value.strong {
+            background: rgba(16, 185, 129, 0.2);
+            color: var(--secondary);
+        }
+
+        .entropy-info {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+
+        .strength-bar {
+            height: 12px;
+            background: var(--bg-input);
+            border-radius: 6px;
+            overflow: hidden;
+            border: 1px solid var(--border);
+        }
+
+        .strength-fill {
+            height: 100%;
+            border-radius: 6px;
+            transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1), background 0.6s ease;
+            background: linear-gradient(90deg, var(--primary), var(--secondary));
+            width: 0;
+        }
+
+        /* Action Buttons */
+        .action-buttons {
+            display: flex;
+            gap: 12px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .action-btn {
+            padding: 12px 24px;
+            border-radius: var(--radius-sm);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+        }
+
+        .btn-copy {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-copy:hover {
+            background: var(--primary-light);
+            transform: translateY(-2px);
+        }
+
+        .btn-copy.copied {
+            background: var(--secondary);
+        }
+
+        .btn-regenerate {
+            background: transparent;
+            border: 2px solid var(--primary);
+            color: var(--primary);
+        }
+
+        .btn-regenerate:hover {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-new-item {
+            background: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+        }
+
+        .btn-new-item:hover {
+            background: var(--secondary);
+            color: white;
+        }
+
+        /* ========================================================================
+           FOOTER
+           ======================================================================== */
+        .footer {
+            text-align: center;
+            margin-top: 40px;
+            padding: 20px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+
+        .footer a {
+            color: var(--primary-light);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        /* ========================================================================
+           TOAST NOTIFICATION
+           ======================================================================== */
+        .toast {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: var(--bg-card);
+            color: var(--text-primary);
+            padding: 15px 25px;
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            z-index: 1000;
+            opacity: 0;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+
+        /* ========================================================================
+           RESPONSIVE DESIGN
+           ======================================================================== */
+        @media (max-width: 768px) {
+            .logo {
+                font-size: 2.2rem;
+            }
+
+            .items-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .options-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .password-display {
+                font-size: 1.2rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+            }
+
+            .action-btn {
+                justify-content: center;
+            }
+
+            .filter-tabs {
+                gap: 8px;
+            }
+
+            .filter-tab {
+                padding: 6px 12px;
+                font-size: 0.8rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 10px;
+            }
+
+            .header {
+                padding: 20px 10px;
+            }
+
+            .controls-section,
+            .result-section {
+                padding: 20px 15px;
+            }
+        }
+
+        /* ========================================================================
+           ANIMATIONS
+           ======================================================================== */
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            75% { transform: translateX(5px); }
+        }
+
+        .shake {
+            animation: shake 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <span class="logo-icon">🔐</span>
+            <h1 class="logo">FunPass</h1>
+            <p class="tagline">Generate secure, memorable passwords from poems, quotes, code & more</p>
+            <span class="badge">✨ 25 Unique Sources • 🔒 Leet Speak • 🎨 Customizable</span>
+        </header>
+
+        <!-- Category Filters -->
+        <section class="filter-section">
+            <div class="filter-tabs" id="filterTabs">
+                <button class="filter-tab active" data-category="all">
+                    <span>🎯</span> All
+                </button>
+            </div>
+        </section>
+
+        <!-- Items Grid -->
+        <section class="items-section">
+            <h2 class="section-title">
+                <span>📚</span> Choose Your Source
+            </h2>
+            <div class="items-grid" id="itemsGrid"></div>
+        </section>
+
+        <!-- Controls -->
+        <section class="controls-section">
+            <div class="control-group">
+                <div class="control-label">
+                    <span>📏 Password Length</span>
+                    <span class="length-display" id="lengthValue">16</span>
+                </div>
+                <input type="range" id="lengthSlider" min="8" max="32" value="16">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>⚙️ Options</span>
+                </div>
+                <div class="options-grid">
+                    <label class="option-item">
+                        <input type="checkbox" id="useNumbers" checked>
+                        <span class="option-text">🔢 Numbers</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="useSymbols" checked>
+                        <span class="option-text">🎭 Symbols</span>
+                    </label>
+                    <label class="option-item">
+                        <input type="checkbox" id="useLeet" checked>
+                        <span class="option-text">💀 Leet Speak</span>
+                    </label>
+                </div>
+            </div>
+
+            <button class="generate-btn" id="generateBtn" onclick="generatePassword()">
+                <span class="spinner"></span>
+                <span class="btn-text">🚀 Generate Password</span>
+            </button>
+        </section>
+
+        <!-- Result -->
+        <section class="result-section" id="resultSection">
+            <div class="result-header">
+                <p class="result-title">Your Generated Password</p>
+                <p class="result-source" id="resultSource"></p>
+            </div>
+
+            <div class="password-display" id="passwordDisplay"></div>
+
+            <div class="strength-section">
+                <div class="strength-header">
+                    <span class="strength-label">
+                        Security Level:
+                        <span class="strength-value" id="strengthValue">WEAK</span>
+                    </span>
+                    <span class="entropy-info" id="entropyInfo"></span>
+                </div>
+                <div class="strength-bar">
+                    <div class="strength-fill" id="strengthFill"></div>
+                </div>
+            </div>
+
+            <div class="action-buttons">
+                <button class="action-btn btn-copy" onclick="copyPassword()">
+                    <span id="copyIcon">📋</span>
+                    <span id="copyText">Copy to Clipboard</span>
+                </button>
+                <button class="action-btn btn-regenerate" onclick="generatePassword()">
+                    <span>🔄</span> Regenerate
+                </button>
+                <button class="action-btn btn-new-item" onclick="selectRandomItem()">
+                    <span>🎲</span> Random Source
+                </button>
+            </div>
+        </section>
+
+        <!-- Footer -->
+        <footer class="footer">
+            <p>Made with ❤️ by <a href="https://github.com" target="_blank">FunPass</a> • 
+            All passwords generated locally • No data stored</p>
+        </footer>
+    </div>
+
+    <!-- Toast Notification -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        // ========================================================================
+        // DATA & STATE
+        // ========================================================================
+        const items = {{ items | tojson }};
+        let selectedItemId = null;
+        let activeFilter = 'all';
+        let currentPassword = '';
+
+        // ========================================================================
+        // INITIALIZATION
+        // ========================================================================
+        function init() {
+            renderFilterTabs();
+            renderItems();
+            setupEventListeners();
+        }
+
+        function renderFilterTabs() {
+            const categories = [...new Set(items.map(item => item.category))];
+            const container = document.getElementById('filterTabs');
+            
+            categories.forEach(category => {
+                const item = items.find(i => i.category === category);
+                const tab = document.createElement('button');
+                tab.className = 'filter-tab';
+                tab.dataset.category = category;
+                tab.innerHTML = `<span>${item.icon}</span> ${category}`;
+                tab.onclick = () => setFilter(category);
+                container.appendChild(tab);
+            });
+        }
+
+        function renderItems() {
+            const grid = document.getElementById('itemsGrid');
+            const filtered = activeFilter === 'all' 
+                ? items 
+                : items.filter(item => item.category === activeFilter);
+            
+            grid.innerHTML = filtered.map(item => `
+                <div class="item-card ${selectedItemId === item.id ? 'selected' : ''}" 
+                     data-id="${item.id}" 
+                     onclick="selectItem(${item.id})">
+                    <div class="selected-indicator">✓</div>
+                    <div class="item-header">
+                        <span class="item-icon">${item.icon}</span>
+                        <span class="item-category">${item.category}</span>
+                        <span class="item-author">${item.author}</span>
+                    </div>
+                    <div class="item-text" title="${item.text}">${item.text}</div>
+                </div>
+            `).join('');
+        }
+
+        function setupEventListeners() {
+            // Length slider
+            const slider = document.getElementById('lengthSlider');
+            const lengthValue = document.getElementById('lengthValue');
+            slider.addEventListener('input', (e) => {
+                lengthValue.textContent = e.target.value;
+            });
+
+            // Filter tabs
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-tab').forEach(t => t.classList.remove('active'));
+                    tab.classList.add('active');
+                });
+            });
+        }
+
+        // ========================================================================
+        // FILTER & SELECTION
+        // ========================================================================
+        function setFilter(category) {
+            activeFilter = category;
+            document.querySelectorAll('.filter-tab').forEach(tab => {
+                tab.classList.toggle('active', tab.dataset.category === category);
+            });
+            renderItems();
+        }
+
+        function selectItem(id) {
+            selectedItemId = id;
+            renderItems();
+            
+            const item = items.find(i => i.id === id);
+            showToast(`${item.icon} Selected: ${item.category} - ${item.author}`);
+        }
+
+        function selectRandomItem() {
+            const randomItem = items[Math.floor(Math.random() * items.length)];
+            selectItem(randomItem.id);
+        }
+
+        // ========================================================================
+        // PASSWORD GENERATION
+        // ========================================================================
+        async function generatePassword() {
+            // Auto-select if none selected
+            if (selectedItemId === null) {
+                selectRandomItem();
+                await new Promise(resolve => setTimeout(resolve, 300));
+            }
+
+            const btn = document.getElementById('generateBtn');
+            btn.classList.add('loading');
+
+            try {
+                const response = await fetch('/generate', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        item_id: selectedItemId,
+                        length: parseInt(document.getElementById('lengthSlider').value),
+                        use_numbers: document.getElementById('useNumbers').checked,
+                        use_symbols: document.getElementById('useSymbols').checked,
+                        use_leet: document.getElementById('useLeet').checked
+                    })
+                });
+
+                if (!response.ok) throw new Error('Generation failed');
+
+                const data = await response.json();
+                displayResult(data);
+            } catch (error) {
+                showToast('❌ Error generating password. Please try again.');
+            } finally {
+                btn.classList.remove('loading');
+            }
+        }
+
+        function displayResult(data) {
+            currentPassword = data.password;
+            
+            // Display password with color-coded characters
+            const display = document.getElementById('passwordDisplay');
+            display.innerHTML = data.password.split('').map(char => {
+                let className = 'char';
+                if (/[0-9]/.test(char)) className += ' number';
+                else if (/[^a-zA-Z0-9]/.test(char)) className += ' symbol';
+                else className += ' letter';
+                return `<span class="${className}">${char}</span>`;
+            }).join('');
+
+            // Update source info
+            document.getElementById('resultSource').textContent = `Source: ${data.source}`;
+
+            // Update strength
+            const strengthValue = document.getElementById('strengthValue');
+            const strengthFill = document.getElementById('strengthFill');
+            const entropyInfo = document.getElementById('entropyInfo');
+
+            strengthValue.textContent = `${data.strength.emoji} ${data.strength.label}`;
+            strengthValue.className = `strength-value ${data.strength.level}`;
+            
+            strengthFill.style.width = `${data.strength.percentage}%`;
+            strengthFill.style.background = `linear-gradient(90deg, ${data.strength.color}, ${data.strength.color}dd)`;
+            
+            entropyInfo.textContent = `Entropy: ${data.entropy} bits`;
+
+            // Show result section
+            const resultSection = document.getElementById('resultSection');
+            resultSection.classList.add('visible');
+            resultSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        // ========================================================================
+        // CLIPBOARD & UTILITIES
+        // ========================================================================
+        async function copyPassword() {
+            if (!currentPassword) return;
+
+            try {
+                await navigator.clipboard.writeText(currentPassword);
+                
+                const btn = document.querySelector('.btn-copy');
+                const icon = document.getElementById('copyIcon');
+                const text = document.getElementById('copyText');
+                
+                btn.classList.add('copied');
+                icon.textContent = '✅';
+                text.textContent = 'Copied!';
+                
+                showToast('📋 Password copied to clipboard!');
+                
+                setTimeout(() => {
+                    btn.classList.remove('copied');
+                    icon.textContent = '📋';
+                    text.textContent = 'Copy to Clipboard';
+                }, 2000);
+            } catch (err) {
+                // Fallback for older browsers
+                const textArea = document.createElement('textarea');
+                textArea.value = currentPassword;
+                textArea.style.position = 'fixed';
+                textArea.style.left = '-999999px';
+                document.body.appendChild(textArea);
+                textArea.select();
+                try {
+                    document.execCommand('copy');
+                    showToast('📋 Password copied to clipboard!');
+                } catch (e) {
+                    showToast('❌ Failed to copy. Please copy manually.');
+                }
+                document.body.removeChild(textArea);
+            }
+        }
+
+        function showToast(message) {
+            const toast = document.getElementById('toast');
+            toast.textContent = message;
+            toast.classList.add('show');
+            
+            setTimeout(() => {
+                toast.classList.remove('show');
+            }, 3000);
+        }
+
+        // ========================================================================
+        // START APP
+        // ========================================================================
+        init();
+    </script>
+</body>
+</html>
